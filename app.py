@@ -284,21 +284,25 @@ def update_profile():
         phone = data[3]['phone']
         print(uname, job, city, phone)
         if(uname==None or job==None or city==None):
+            print("Error")
             return render_template('profile.html', err=True)
         conn=sqlite3.connect('instance/users.db')
         con=conn.cursor()
         sq=f"DELETE FROM profile WHERE userid={uid}"
         con.execute(sq)
         sqlite_insert_blob_query = " INSERT INTO profile (userid, full_name, mobile_no, profession,city,pre_lang,pro_pic) VALUES (?, ?, ?, ?, ?, ?, ?)"
-        empPhoto = convertToBinaryData("C:/Users/Sony/Documents/SoftwareEngineeringProject-PlantDiseaseDetection/img/farmer-image.png")
+        empPhoto = convertToBinaryData("C:/Users/Ananyaa/Documents/LeafCuro/img/farmer-image.png")
         print(uid) 
         data_tuple = (uid,uname, phone, job,city,"ENGLISH",empPhoto)
         con.execute(sqlite_insert_blob_query, data_tuple)
         conn.commit()
+        stat=f"SELECT * FROM members WHERE userid='{uid}'"
+        con.execute(stat)
+        t1 = con.fetchall()
         stat=f"SELECT * FROM profile WHERE userid='{uid}'"
         con.execute(stat)
-        data = con.fetchall()
-        return render_template('profile.html', data=data)
+        t2 = con.fetchall()
+        return render_template('profile.html', data=zip(t1,t2))
     else:
         return render_template('signup.html')
 
@@ -309,4 +313,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
